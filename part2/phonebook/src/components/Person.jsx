@@ -4,7 +4,7 @@ import { NewNameText, NewNumberText } from './InputTextFields.jsx'
 export const PersonForm = ( props ) => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
-  const { handleNewPerson, personExists } = props
+  const { handleNewPerson, personExists, handleUpdate, onError } = props
 
   const onNameChange = (event) => {
     setNewName(event.target.value)
@@ -17,12 +17,17 @@ export const PersonForm = ( props ) => {
   const handleSubmit = (event) => {
     event.preventDefault()
     if (personExists(newName)) {
-      alert(`${newName} is already added to phonebook`)
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const updatedPerson = { name: newName, number: newNumber }
+        handleUpdate(updatedPerson)
+      } else {
+        onError(`Person not updated: ${newName} already exists in the phonebook`)
+      }
     } else {
       handleNewPerson({ name: newName, number: newNumber })
-      setNewName('')
-      setNewNumber('')
     }
+    setNewName('')
+    setNewNumber('')
   }
 
   return (
@@ -41,13 +46,15 @@ export const PersonForm = ( props ) => {
 
 export const PersonList = ( props ) => {
   console.log(props)
+  const { persons, handleDelete } = props
   return (
     <div>
-      {props.persons.map((person) => (
+      {persons.map((person) => (
         console.log(person),
-        <p key={person.id}>
-          {person.name}: {person.number}
-        </p>
+        <div key={person.id}>
+          {person.name}: {person.number}&nbsp;
+          <button onClick={() => handleDelete(person)}>delete</button>
+        </div>
       ))}
     </div>
   )
