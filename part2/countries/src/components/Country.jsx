@@ -1,3 +1,5 @@
+import { Weather } from './Weather'
+
 export const Country = (props) => {
     const { country } = props
     console.log("Display single country", country)
@@ -17,6 +19,7 @@ export const Country = (props) => {
           alt={`Flag of ${country.name.common}`}
           width="200"
         />
+        <Weather city={country.capital} />
       </>
     )
 }
