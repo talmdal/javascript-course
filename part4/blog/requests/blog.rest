@@ -1,0 +1,12 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "A Blog Post",
+    "author": "Ada Lovelace",
+    "url": "/api/blog/posts",
+    "likes": 0
+}
+
+###
+GET http://localhost:3003/api/blogs
