@@ -27,6 +27,7 @@ const generateId = () => Math.floor(Math.random() * 100000)
 
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 
 morgan.token('body', function getBody (req) {
   return req.method === 'POST'
@@ -38,6 +39,7 @@ const logger = morgan(':method :url :status - :response-time :body')
 const app = express()
 app.use(express.json())
 app.use(logger)
+app.use(cors())
 
 app.get('/api/persons', (req, res) => {
   res.json(PERSONS)

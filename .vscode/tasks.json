@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "server",
+      "type": "process",
+      "command": "pwsh.exe",
+      "args": [
+        "-NoLogo",
+        "-File",
+        "${workspaceFolder}/part3/server.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/part3"
+      },
+      "presentation": {
+        "echo": true,
+        "focus": true,
+        "panel": "new",
+        "reveal": "always",
+        "close": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "client",
+      "type": "process",
+      "command": "pwsh.exe",
+      "args": [
+        "-NoLogo",
+        "-File",
+        "${workspaceFolder}/part3/client.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/part3"
+      },
+      "presentation": {
+        "echo": true,
+        "focus": true,
+        "panel": "new",
+        "reveal": "always",
+        "close": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Phonebook",
+      "dependsOn": [
+        "server",
+        "client"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    }
+  ]
+}
