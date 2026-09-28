@@ -13,12 +13,13 @@
   "scripts": {
     "dev": "node --watch-path=. app.js",
     "lint": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test"
   },
   "dependencies": {
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
-    "mongoose": "^9.10.2"
+    "mongoose": "^9.10.2",
+    "morgan": "^1.12.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
