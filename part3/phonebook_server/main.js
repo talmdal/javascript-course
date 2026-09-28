@@ -1,33 +1,10 @@
+require('dotenv').config()
 const PORT = process.env.PHONEBOOK_PORT || 3001
-
-let PERSONS = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
-
-const generateId = () => Math.floor(Math.random() * 100000)
 
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const personService = require('./services/person.js')
 
 morgan.token('body', function getBody (req) {
   return req.method === 'POST'
@@ -36,74 +13,116 @@ morgan.token('body', function getBody (req) {
 })
 const logger = morgan(':method :url :status - :response-time :body')
 
+const errorHandler = (error, req, res) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return res.status(400).json({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    res.status(400).json({ error: error.message })
+  }
+
+  res.status(error.status || 500).json({
+    error: error.message || 'Internal server error'
+  })
+}
+
 const app = express()
 app.use(express.json())
 app.use(logger)
 app.use(cors())
 
 app.get('/api/persons', (req, res) => {
-  res.json(PERSONS)
+  personService.getAll()
+    .then(persons => res.json(persons))
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
-  const person = PERSONS.find( person => person.id === id )
-  console.log(person)
-  if (person) {
-    res.json(person)
-  } else {
-    res.status(404).end()
-  }
+  personService.findById(id)
+    .then(person => {
+      if(person) {
+        res.json(person)
+      } else {
+        res.status(401).end()
+      }
+    })
+    .catch(error => {
+      next(error)
+    })
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
-  const {name, number} = body
-  console.log(name, number)
-  if (!name) {
-    return res.status(400).json({
-      error: 'name is required'
+  const { name, number } = body
+
+  personService.findByName(name)
+    .then(person => {
+      if (person) {
+        return next({ status: 400, message: 'name must be unique' })
+      }
+      else {
+        return personService.create(name, number)
+          .then(person => {
+            res.json(person)
+          })
+      }
     })
-  }
-  if (!number) {
-    return res.status(400).json({
-      error: 'number is required'
+    .catch(error => {
+      next(error)
     })
-  }
-  const person = PERSONS.find(person => person.name === name)
-  if (person) {
-    return res.status(400).json({
-      error: 'name must be unique'
-    })
-  }
-  const newPerson = {
-    name: body.name,
-    number: body.number,
-    id: generateId()
-  }
-  PERSONS = PERSONS.concat(newPerson)
-  res.json(newPerson)
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.put('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
-  const person = PERSONS.find( person => person.id === id )
-  if (person) {
-    PERSONS = PERSONS.filter( person => person.id !== id)
-    res.status(204).end()
-  } else {
-    res.status(404).end()  }
+  const body = req.body
+  const { name, number } = body
+
+  personService.findById(id)
+    .then(person => {
+      if(person) {
+        return personService.update(id, name, number)
+          .then(person => {
+            res.json(person)
+          })
+      } else {
+        res.status(401).end()
+      }
+    })
+    .catch(error => {
+      next(error)
+    })
 })
 
-app.get('/info', (req, res) => {
-  res.send(
-    `
-    Phoneebook has info for ${PERSONS.length} people
-    <br />
-    ${new Date()}
-    `
-  )
+app.delete('/api/persons/:id', (req, res, next) => {
+  const id = req.params.id
+  personService.findById(id)
+    .then(person => {
+      if(person) {
+        return personService.destroy(id)
+          .then(() => res.status(204).end())
+      } else {
+        next({ status: 401, message: `No phone number found for '${id}'` })
+      }
+    })
+    .catch(error => {
+      next(error)
+    })
 })
+
+app.get('/info', (req, res, next) => {
+  personService.count()
+    .then(count => res.send(
+      `
+      Phonebook has info for ${count} people
+      <br />
+      ${new Date()}
+      `
+    ))
+    .catch(error => next(error))
+})
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)

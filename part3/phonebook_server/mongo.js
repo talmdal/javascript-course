@@ -1,3 +1,4 @@
+require('dotenv').config()
 const personService = require('./services/person.js')
 
 // MOve past the node environment args to ours

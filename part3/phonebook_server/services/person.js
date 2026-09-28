@@ -1,24 +1,16 @@
 const mongoose = require('mongoose')
 
-const url = process.env.MONGODB_URI
-
-mongoose.set('strictQuery',false)
-
-mongoose.connect(url, { family: 4 })
-
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String
-})
-
-const Person = mongoose.model('Person', personSchema)
+const Person = require('../models/Person')
 
 const getAll = () => Person.find({})
-  .then(result => result.map(person => ({
-    name: person.name,
-    number: person.number,
-    id: person._id
-  })))
+
+const count = () => Person.countDocuments({})
+
+const findById = (id)  => Person.find({ _id: id })
+  .then(result => result[0])
+
+const findByName = (name)  => Person.find({ name: name })
+  .then(result => result[0])
 
 const create = (name, number) => {
   const person = new Person({
@@ -29,6 +21,16 @@ const create = (name, number) => {
   return person.save()
 }
 
+const update = (id, name, number) => {
+  const opts = { runValidators: true }
+  return Person.updateOne({ _id:  id },
+    { name, number },
+    opts
+  )
+}
+
+const destroy = (id) => Person.deleteOne({ _id: id })
+
 const disconnect = () => mongoose.disconnect()
 
-module.exports = { getAll, create, disconnect /*, update, destroy*/ }
+module.exports = { getAll, findById, findByName, count, create, update, destroy, disconnect }
