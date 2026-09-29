@@ -6,6 +6,8 @@ const errorHandler = (error, req, res, next) => {
     res.status(400).json({ error: error.message })
   } else if (error.name === 'MongooseError' && error.message === 'User name must be unique') {
     return res.status(400).json({ error: 'expected `username` to be unique' })
+  } else if (error.name ===  'JsonWebTokenError') {
+    return res.status(401).json({ error: 'token invalid' })
   }
 
   res.status(error.status || 500).json({

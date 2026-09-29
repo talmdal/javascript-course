@@ -45,13 +45,13 @@ const blogsInDb = async () => {
   return blogs.map(blog => blog.toJSON())
 }
 
-const createTestUser = async () => {
+const createTestUser = async (username, name, password) => {
   const User = require('../models/users')
   await User.deleteMany({})
 
-  const passwordHash = await bcrypt.hash('sekret', 10)
+  const passwordHash = await bcrypt.hash(password, 10)
   const user = new User({
-    username: 'root', name: 'SuperUser', passwordHash
+    username, name, passwordHash
   })
 
   const newUser = await user.save()

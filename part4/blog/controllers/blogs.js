@@ -1,6 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blogs')
-const User = require('../models/users')
+const { userExtractor } = require('../middleware/userExtractor')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -9,15 +9,10 @@ blogsRouter.get('/', async (request, response) => {
   return response.json(blogs)
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', userExtractor, async (request, response) => {
   const body = request.body
-  const user = await User.findById(body.userId)
+  const user = request.user
 
-  if (!user) {
-    return response.status(400).json({ error: 'userId missing or not valid' })
-  }
-
-  delete body.userId
   const blog = new Blog({ ...body, user: user.id })
   const result = await blog.save()
   user.blogs = user.blogs.concat(result.id)
@@ -48,9 +43,16 @@ blogsRouter.put('/:id', async (request, response) => {
   return response.json(updatedBlog)
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
-  response.status(204).end()
+blogsRouter.delete('/:id', userExtractor, async (request, response) => {
+  const user = request.user
+  const blog = await Blog.findById(request.params.id)
+
+  if (blog.user.toString() === user.id.toString()) {
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  } else {
+    response.status(401).end()
+  }
 })
 
 module.exports = blogsRouter

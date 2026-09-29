@@ -1,13 +1,17 @@
 POST http://localhost:3003/api/blogs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJidW5ueSIsImlkIjoiNmFiYmY3YmNmMmFiZGRmM2NjM2RjZDMzIiwiaWF0IjoxNzkwNzA2NDIzLCJleHAiOjE3OTA3MTAwMjN9.9rvMfhKzSROWI7HcSnICLFdJRAdj0YctslMTqHdctVg
 Content-Type: application/json
 
 {
     "title": "A Blog Post",
-    "author": "Ada Lovelace",
+    "author": "Bugs bunny",
     "url": "/api/blog/posts",
-    "likes": 0,
-    "userId": "6abbd44e6688c6feb480a693"
+    "likes": 0
 }
 
 ###
 GET http://localhost:3003/api/blogs
+
+###
+DELETE http://localhost:3003/api/blogs/6abc033190c493bd441f4f25
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJidW5ueSIsImlkIjoiNmFiYmY3YmNmMmFiZGRmM2NjM2RjZDMzIiwiaWF0IjoxNzkwNzA2NDIzLCJleHAiOjE3OTA3MTAwMjN9.9rvMfhKzSROWI7HcSnICLFdJRAdj0YctslMTqHdctVg
