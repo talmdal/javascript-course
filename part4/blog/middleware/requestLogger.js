@@ -7,6 +7,6 @@ morgan.token('body', function getBody (req) {
     : ''
 })
 
-const logger = morgan(':method :url :status - :response-time :body')
+const requestLogger = morgan(':method :url :status - :response-time :body')
 
-module.exports = { logger }
+module.exports = { requestLogger }

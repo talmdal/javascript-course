@@ -11,11 +11,13 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
-    "dev": "node --watch-path=. app.js",
-    "lint": "eslint .",
-    "test": "node --test"
+    "dev": "cross-env NODE_ENV=development node --watch-path=. index.js",
+    "test": "cross-env NODE_ENV=test node --test",
+    "mongo-test": "cross-env NODE_ENV=test node mongo.js",
+    "lint": "eslint ."
   },
   "dependencies": {
+    "cross-env": "^10.1.0",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
     "mongoose": "^9.10.2",
@@ -25,6 +27,7 @@
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
     "eslint": "^10.11.0",
-    "globals": "^17.12.0"
+    "globals": "^17.12.0",
+    "supertest": "^7.3.0"
   }
 }
