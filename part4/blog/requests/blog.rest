@@ -5,7 +5,8 @@ Content-Type: application/json
     "title": "A Blog Post",
     "author": "Ada Lovelace",
     "url": "/api/blog/posts",
-    "likes": 0
+    "likes": 0,
+    "userId": "6abbd44e6688c6feb480a693"
 }
 
 ###

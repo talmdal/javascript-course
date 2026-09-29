@@ -1,22 +1,14 @@
 const mongoose = require('mongoose')
 
-const mongoDBUrl = require('../utils/config').mongoDBUrl
-
-mongoose.set('strictQuery',false)
-
-mongoose.connect(mongoDBUrl, { family: 4 })
-  .then( () => {
-    console.log('connected to MongoDB')
-  })
-  .catch(error => {
-    console.log('error connecting to MongoDB:', error.message)
-  })
-
 const blogSchema = mongoose.Schema({
-  title: { type: String, required: true },
+  title: { type: String, required: [ true, 'Title is required' ] },
   author: String,
-  url: { type: String, required: true },
+  url: { type: String, required: [ true, 'Url is required' ] },
   likes: { type: Number, default: 0 },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
 
 blogSchema.set('toJSON', {

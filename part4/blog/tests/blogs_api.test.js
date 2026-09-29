@@ -1,17 +1,26 @@
 const assert = require('node:assert')
-const { test, after, beforeEach, describe } = require('node:test')
+const { test, after, before, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const Blog = require('../models/blogs')
+const User = require('../models/users')
 const app = require('../app')
+const { init } = require('../utils/mongo')
 const helper = require('./test_helper')
 
 const api = supertest(app)
 
+before(async () => {
+  await init()
+})
+
 describe('when there is initially some blogs saved', () => {
+  let testUser
   beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
+    await User.deleteMany({})
+    testUser = await helper.createTestUser()
   })
 
   test('Verify blogs are return as json', async () => {
@@ -33,7 +42,8 @@ describe('when there is initially some blogs saved', () => {
         title: 'new entry',
         author: 'Suzy Que',
         url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-        likes: 0
+        likes: 0,
+        userId: testUser.id
       }
     await api
       .post('/api/blogs/')
@@ -49,7 +59,8 @@ describe('when there is initially some blogs saved', () => {
       {
         title: 'new entry',
         author: 'Suzy Que',
-        url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf'
+        url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+        userId: testUser.id
       }
     const response = await api
       .post('/api/blogs/')
