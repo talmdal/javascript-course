@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
-import Blog from './components/Blog'
+import { useState, useEffect, useRef } from 'react'
+import { BlogList } from './components/Blog'
+import { LoginForm } from './components/LoginForm.jsx'
+import Notification from './components/Notification.jsx'
+import { Togglable } from './components/Toggle.jsx'
+import { NewBlogForm } from './components/NewBlogForm.jsx'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import Notification from './components/Notification.jsx'
-import { TextField } from './components/TextField.jsx'
 import { getStorageUser } from './services/storageUser.js'
 
 const App = () => {
@@ -14,9 +16,7 @@ const App = () => {
   const [ notification, setNotification ] = useState(null)
   const [ msgType, setMsgType ] = useState('success')
 
-  const [ blogTitle, setBlogTitle ] = useState('')
-  const [ blogAuthor, setBlogAuthor ] = useState('')
-  const [ blogUrl, setBlogUrl ] = useState('')
+  const blogFormRef = useRef()
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -39,48 +39,14 @@ const App = () => {
     setUser(null)
   }
 
-  const loginForm = () => (
-    <>
-      <h2>log into application</h2>
-      <Notification msgType={msgType} message={notification} />
-      <form onSubmit={handleLogin}>
-        <TextField
-          label='username:'
-          type='text'
-          value={username}
-          onChange={ (value) => setUsername(value) }
-        />
-        <TextField
-          label='password:'
-          type='password'
-          value={password}
-          onChange={ (value) => setPassword(value) }
-        />
-        <button type="submit">login</button>
-      </form>
-      </>
-  )
-
-  const blogList = () => (
-    <div>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
-    </div>
-  )
-
-  const handleNewBlog = (event) => {
-    event.preventDefault()
-    blogService.create({
-      title: blogTitle, author: blogAuthor, url: blogUrl
-    })
+  const handleNewBlog = (newBlog, onSuccess) => {
+    blogService.create(newBlog)
       .then(blog => {
         setBlogs(currentBlogs => currentBlogs.concat(blog))
         setMsgType('success')
         setNotification(`A new blog. ${blog.title} by ${blog.author}`)
-        setBlogTitle('')
-        setBlogAuthor('')
-        setBlogUrl('')
+        onSuccess('')
+        blogFormRef.current.toggleVisibility()
       })
       .catch(error => {
         setMsgType('error')
@@ -88,36 +54,38 @@ const App = () => {
       })
   }
 
-  const newBlogForm = () => {
-    return (
-        <div>
-          <h2>create new</h2>
-          <form>
-            <TextField
-              label='title:'
-              type='text'
-              value={blogTitle}
-              onChange={ (value) => setBlogTitle(value) }
-            />
-            <TextField
-              label='author:'
-              type='text'
-              value={blogAuthor}
-              onChange={ (value) => setBlogAuthor(value) }
-            />
-            <TextField
-              label='url:'
-              type='text'
-              value={blogUrl}
-              onChange={ (value) => setBlogUrl(value) }
-            />
-            <div>
-              <button type="submit" onClick={handleNewBlog}>create</button>
-            </div>
-          </form>
-        </div>
-      )
+  const incrementLiked = (blog) => {
+    const updatedBlog = { ...blog, likes: blog.likes + 1 }
+    delete updatedBlog.user
+    console.log('increment like for:', JSON.stringify(updatedBlog))
+    blogService.update(updatedBlog)
+      .then(blog => {
+        setBlogs(
+          currentBlogs => currentBlogs.map(
+            b => b.id === updatedBlog.id ? updatedBlog : b
+          )
+        )
+        setMsgType('success')
+        setNotification(`Updated the blog. ${blog.title} by ${blog.author}`)
+      })
   }
+
+  const removeBlog = (blog) => {
+    console.log('Delete Blog:', JSON.stringify(blog))
+    if (window.confirm(`Remove blog ${blog.title}?`)) {
+      blogService.destroy(blog.id)
+      .then(() => {
+        setBlogs(
+          currentBlogs => currentBlogs.filter(
+            b => b.id !== blog.id
+          )
+        )
+        setMsgType('success')
+        setNotification(`Deleted the blog. ${blog.title} by ${blog.author}`)
+      })
+    }
+  }
+
 
   useEffect(() => {
     setUser(getStorageUser())
@@ -131,19 +99,37 @@ const App = () => {
 
   return (
     <div>
-
-      { !user && loginForm() }
-       { user && (
+      <h2>blogs</h2>
+      <Notification msgType={msgType} message={notification} />
+      { !user && (
+        <Togglable buttonLabel='log in'>
+          <LoginForm
+            onSubmit={handleLogin}
+            username={username}
+            password={password}
+            onUsernameChange={ (value) => setUsername(value) }
+            onPasswordChange={ (value) => setPassword(value) }
+          />
+        </Togglable>
+      )}
+      { user && (
         <div>
-          <h2>blogs</h2>
-          <Notification msgType={msgType} message={notification} />
           <p>
             { user.name } is logged in&nbsp;
             <button type='button' onClick={handleLogout}>logout</button>
           </p>
-          { newBlogForm() }
+          <Togglable buttonLabel='create new blog' ref={blogFormRef} >
+            <NewBlogForm
+              onSubmit={handleNewBlog}
+            />
+          </Togglable>
           <br />
-          { blogList() }
+          <BlogList
+            blogs={blogs}
+            onLiked={incrementLiked}
+            onDelete={removeBlog}
+          />
+          {/* { blogList() } */}
         </div>
         )
       }

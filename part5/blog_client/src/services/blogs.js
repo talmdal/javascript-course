@@ -20,6 +20,18 @@ const create = (newObject) => {
     })
 }
 
+const update = (newObject) => {
+  const token = getStorageUser().token
+  return axios
+    .put(`${baseUrl}/blogs/${newObject.id}`, newObject, {
+      headers: { Authorization: `Bearer ${token}`}
+    })
+    .then(response => {
+      console.log('Likes updated:', response.data)
+      return response.data
+    })
+}
+
 const destroy = (id) => {
   const token = getStorageUser().token
   return axios
@@ -32,4 +44,4 @@ const destroy = (id) => {
     })
 }
 
-export default { getAll, create, destroy }
+export default { getAll, create, update, destroy }
