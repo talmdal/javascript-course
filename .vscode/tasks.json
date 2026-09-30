@@ -53,6 +53,59 @@
       ],
       "dependsOrder": "parallel",
       "problemMatcher": []
+    },
+    {
+      "label": "blog_server",
+      "type": "process",
+      "command": "pwsh.exe",
+      "args": [
+        "-NoLogo",
+        "-File",
+        "${workspaceFolder}/part5/blog_server.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/part5"
+      },
+      "presentation": {
+        "echo": true,
+        "focus": true,
+        "panel": "new",
+        "reveal": "always",
+        "close": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "blog_client",
+      "type": "process",
+      "command": "pwsh.exe",
+      "args": [
+        "-NoLogo",
+        "-File",
+        "${workspaceFolder}/part5/blog_client.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/part5"
+      },
+      "presentation": {
+        "echo": true,
+        "focus": true,
+        "panel": "new",
+        "reveal": "always",
+        "close": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Blog",
+      "dependsOn": [
+        "blog_server",
+        "blog_client"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
     }
   ]
 }
