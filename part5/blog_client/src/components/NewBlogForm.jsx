@@ -17,8 +17,8 @@ export const NewBlogForm = (props) => {
   }
 
   const submitHandler = (event) => {
-     event.preventDefault()
-     onSubmit({title, author, url}, resetForm)
+    event.preventDefault()
+    onSubmit({ title, author, url }, resetForm)
   }
   return (
     <div>

@@ -34,7 +34,7 @@ const App = () => {
     }
   }
 
-  const handleLogout = () =>{
+  const handleLogout = () => {
     window.localStorage.clear()
     setUser(null)
   }
@@ -74,15 +74,15 @@ const App = () => {
     console.log('Delete Blog:', JSON.stringify(blog))
     if (window.confirm(`Remove blog ${blog.title}?`)) {
       blogService.destroy(blog.id)
-      .then(() => {
-        setBlogs(
-          currentBlogs => currentBlogs.filter(
-            b => b.id !== blog.id
+        .then(() => {
+          setBlogs(
+            currentBlogs => currentBlogs.filter(
+              b => b.id !== blog.id
+            )
           )
-        )
-        setMsgType('success')
-        setNotification(`Deleted the blog. ${blog.title} by ${blog.author}`)
-      })
+          setMsgType('success')
+          setNotification(`Deleted the blog. ${blog.title} by ${blog.author}`)
+        })
     }
   }
 
@@ -131,8 +131,7 @@ const App = () => {
           />
           {/* { blogList() } */}
         </div>
-        )
-      }
+      )}
     </div>
   )
 }

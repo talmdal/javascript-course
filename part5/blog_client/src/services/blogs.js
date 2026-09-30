@@ -12,7 +12,7 @@ const create = (newObject) => {
   const token = getStorageUser().token
   return axios
     .post(`${baseUrl}/blogs`, newObject, {
-      headers: { Authorization: `Bearer ${token}`}
+      headers: { Authorization: `Bearer ${token}` }
     })
     .then(response => {
       console.log('Person added:', response)
@@ -24,7 +24,7 @@ const update = (newObject) => {
   const token = getStorageUser().token
   return axios
     .put(`${baseUrl}/blogs/${newObject.id}`, newObject, {
-      headers: { Authorization: `Bearer ${token}`}
+      headers: { Authorization: `Bearer ${token}` }
     })
     .then(response => {
       console.log('Likes updated:', response.data)
@@ -36,7 +36,7 @@ const destroy = (id) => {
   const token = getStorageUser().token
   return axios
     .delete(`${baseUrl}/blogs/${id}`, {
-      headers: { Authorization: `Bearer ${token}`}
+      headers: { Authorization: `Bearer ${token}` }
     })
     .then(response => {
       console.log('Person deleted:', response)
